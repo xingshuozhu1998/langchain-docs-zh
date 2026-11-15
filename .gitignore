@@ -1,0 +1,5 @@
+upstream/
+site/
+export.zip
+translations.patch
+__pycache__/
