@@ -2,7 +2,7 @@
 
 网站地址：<https://xingshuozhu1998.github.io/langchain-docs-zh/>。
 
-本项目保存官方文档的中文译文与静态发布流程。英文来源为 [langchain-ai/docs 的 a09b855be 提交](https://github.com/langchain-ai/docs/commit/a09b855be906129eed995b9476897b7d1a618376)，对应本地中英对照版本 `6d2fbe808`。原项目许可证保留在 `LICENSE`。
+本项目保存官方文档的中文译文与静态发布流程。英文来源为 [langchain-ai/docs 的 a09b855be 提交](https://github.com/langchain-ai/docs/commit/a09b855be906129eed995b9476897b7d1a618376)，对应本地中英对照版本 `6d2fbe808`，并包含 `3b834dd78` 中由 Luna 补齐的 LangChain 概览首段。原项目许可证保留在 `LICENSE`。
 
 中文范围为 LangChain、LangGraph、Deep Agents，以及原有四篇概念文档；正文保留英文后接中文。本轮由 Luna 更新和复核 161 页，未变化的旧译文继续保留。只发布这一翻译范围，其他文档链接转到官方站；Python、TypeScript 和 Deep Agents Code 页面均保留。
 

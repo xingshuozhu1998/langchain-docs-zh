@@ -31,7 +31,7 @@ function destination(href){
   const u=new URL(href,location.href);
   if(u.origin!==location.origin)return u.href;
   const path=u.pathname.replace(/^\/langchain-docs-zh(?=\/)/,"");
-  if(path==="/llms.txt")return "https://docs.langchain.com/llms.txt";
+  if(path==="/llms.txt"||path.endsWith(".md")||path==="/sitemap.xml")return "https://docs.langchain.com"+path;
   if(/\.[a-z0-9]+$/i.test(path)||/^\/(?:_next|fonts|images)\//.test(path))return u.href;
   return LOCAL_ROUTES.has(path.replace(/\/$/,""))?location.origin+"/langchain-docs-zh"+path+u.search+u.hash:"https://docs.langchain.com"+path+u.search+u.hash;
 }
@@ -66,7 +66,7 @@ def resources(text):
 
 def html_url(attr, path):
     route = urlsplit(path).path.rstrip('/')
-    if attr == 'href' and route == '/llms.txt':
+    if attr == 'href' and (route in {'/llms.txt', '/sitemap.xml'} or route.endswith('.md')):
         return 'https://docs.langchain.com' + path
     if attr == 'href' and route not in LOCAL_ROUTES and not Path(route).suffix and not route.startswith(('/_next/', '/fonts/', '/images/')):
         return 'https://docs.langchain.com' + path
