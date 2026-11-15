@@ -31,6 +31,6 @@ git diff origin/main HEAD -- src | gzip -n | base64 -w 0 > /path/to/langchain-do
 
 源文档构建成功，481 项管道单元测试通过，161 页文字规范检查通过。原本存在的两条 TypeScript 集成失效链接及五项 Mintlify 组件检查警告记录在源仓库 `task.md` 中。
 
-范围内导出页面共 335 个。用全站导出裁剪后的首轮产物为 618.1 MB，低于 1 GB 限制；最终自动构建仍检查产物体积。部署结果以 [Actions 工作流](https://github.com/xingshuozhu1998/langchain-docs-zh/actions) 为准。
+范围内导出页面共 335 个。精简导航后的最终本机产物为 611.5 MB，低于 1 GB 限制；最终自动构建仍检查产物体积。部署结果以 [Actions 工作流](https://github.com/xingshuozhu1998/langchain-docs-zh/actions) 为准。
 
 本机部署代码位于 `/data/zhuxs/llm_agent/langchain-docs-zh`，中英对照源文档仍位于 `/data/zhuxs/llm_agent/docs`。线上阅读不需要启动本机进程。
