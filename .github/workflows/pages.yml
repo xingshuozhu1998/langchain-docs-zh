@@ -1,0 +1,73 @@
+name: Build and publish bilingual docs
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: '3.12'
+      - name: Restore pinned official sources and bilingual translations
+        shell: bash
+        run: |
+          git init upstream
+          git -C upstream remote add origin https://github.com/langchain-ai/docs.git
+          git -C upstream fetch --depth=1 origin a09b855be906129eed995b9476897b7d1a618376
+          git -C upstream checkout --detach FETCH_HEAD
+          base64 --decode translations.patch.gz.b64 | gzip --decompress > translations.patch
+          git -C upstream apply --whitespace=nowarn ../translations.patch
+          # 个人阅读站不使用官方域名绑定的统计、Cookie 配置和验证信息。
+          python -c 'import json,pathlib; p=pathlib.Path("upstream/src/docs.json"); d=json.loads(p.read_text()); d.pop("integrations",None); d["seo"]={"metatags":{"canonical":"https://xingshuozhu1998.github.io/langchain-docs-zh"}}; p.write_text(json.dumps(d,ensure_ascii=False,indent=2))'
+
+      - name: Install and build official documentation pipeline
+        working-directory: upstream
+        run: |
+          uv sync --all-groups --frozen
+          npm ci
+          npm install --global mint@4.2.940
+          .venv/bin/docs build
+      - name: Select translated navigation
+        run: python publish.py --configure upstream/build/docs.json
+      - name: Export translated navigation pages
+        working-directory: upstream/build
+        env:
+          NODE_OPTIONS: --max-old-space-size=6144
+        run: mint export --client-version 0.0.3697 --output ../../export.zip
+      - name: Prepare GitHub Pages project paths and shared assets
+        run: python publish.py export.zip site --source upstream/build
+      - name: Verify rendered pages in a browser
+        run: |
+          npm install --prefix /tmp/pages-browser --no-save puppeteer@24.3.1
+          mkdir -p /tmp/pages-check
+          ln -s "$GITHUB_WORKSPACE/site" /tmp/pages-check/langchain-docs-zh
+          python3 -m http.server 3847 --bind 127.0.0.1 --directory /tmp/pages-check > /tmp/pages-http.log 2>&1 &
+          PUPPETEER_MODULE=/tmp/pages-browser/node_modules/puppeteer/lib/esm/puppeteer/puppeteer.js node check_site.mjs http://127.0.0.1:3847/langchain-docs-zh/
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+  deploy:
+    needs: build
+    runs-on: ubuntu-24.04
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4

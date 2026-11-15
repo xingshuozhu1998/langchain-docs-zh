@@ -27,6 +27,9 @@ try {
   assert(next,'找不到快速开始的导航链接');
   await Promise.all([page.waitForNavigation({waitUntil:'networkidle2',timeout:60000}),next.click()]);
   assert(page.url().startsWith(base+'oss/python/deepagents/quickstart'));
+  const external=await page.$$eval('a[href]',nodes=>nodes.map(n=>n.href).filter(h=>h.startsWith('https://docs.langchain.com/')));
+  assert(external.length>0,'范围外文档应链接到官方站');
+  console.log('官方外链示例：'+external[0]);
   await page.setViewport({width:390,height:844});
   assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'手机页面出现横向溢出');
   assert.deepEqual(errors,[]);
